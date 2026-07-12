@@ -33,7 +33,6 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .defaultSuccessUrl("/public/hola", true)
                 )
-                .httpBasic(org.springframework.security.config.Customizer.withDefaults())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/public/hola")
