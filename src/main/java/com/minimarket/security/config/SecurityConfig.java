@@ -3,6 +3,7 @@ package com.minimarket.security.config;
 import com.minimarket.security.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,14 +23,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilita CSRF con la nueva sintaxis
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll() // Permitir acceso público
-                        .anyRequest().authenticated() // Requiere autenticación para el resto
+                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .defaultSuccessUrl("/public/hola", true) // Redirigir después del login
+                        .defaultSuccessUrl("/public/hola", true)
                 )
+                .httpBasic(org.springframework.security.config.Customizer.withDefaults())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/public/hola")
@@ -45,6 +49,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Configuración de encriptación de contraseñas
+        return new BCryptPasswordEncoder();
     }
 }
