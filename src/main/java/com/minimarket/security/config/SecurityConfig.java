@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/sucursales/**", "/api/stock/**").hasRole("ADMIN")
                         .requestMatchers("/api/proveedores/**", "/api/ordenes-compra/**")
                         .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/promociones/**").authenticated()
+                        .requestMatchers("/api/promociones/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/inventario/**").hasAnyRole("ADMIN", "CAJERO")
                         .requestMatchers("/api/inventario/**").hasRole("ADMIN")
                         .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "CAJERO")
