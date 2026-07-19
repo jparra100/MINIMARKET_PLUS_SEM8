@@ -1,7 +1,7 @@
 package com.minimarket.entity;
 
 import jakarta.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -14,8 +14,25 @@ public class Venta {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
+    @ManyToOne
+    @JoinColumn(name = "sucursal_id", nullable = false)
+    private Sucursal sucursal;
+
     @Column(nullable = false)
-    private Date fecha;
+    private LocalDateTime fecha;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoEntrega tipoEntrega;
+
+    private String direccionDespacho;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoPedido estado;
+
+    @Column(nullable = false)
+    private Double total;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
     private List<DetalleVenta> detalles;
@@ -37,12 +54,52 @@ public class Venta {
         this.usuario = usuario;
     }
 
-    public Date getFecha() {
+    public Sucursal getSucursal() {
+        return sucursal;
+    }
+
+    public void setSucursal(Sucursal sucursal) {
+        this.sucursal = sucursal;
+    }
+
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public TipoEntrega getTipoEntrega() {
+        return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntrega tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
+    }
+
+    public String getDireccionDespacho() {
+        return direccionDespacho;
+    }
+
+    public void setDireccionDespacho(String direccionDespacho) {
+        this.direccionDespacho = direccionDespacho;
+    }
+
+    public EstadoPedido getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPedido estado) {
+        this.estado = estado;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 
     public List<DetalleVenta> getDetalles() {

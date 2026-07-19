@@ -1,5 +1,6 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
+    @JsonIgnore
     private Venta venta;
 
     @ManyToOne

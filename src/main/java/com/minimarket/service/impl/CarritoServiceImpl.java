@@ -1,41 +1,66 @@
 package com.minimarket.service.impl;
 
 import com.minimarket.entity.Carrito;
+import com.minimarket.entity.Producto;
+import com.minimarket.entity.Usuario;
 import com.minimarket.repository.CarritoRepository;
+import com.minimarket.repository.ProductoRepository;
+import com.minimarket.repository.UsuarioRepository;
 import com.minimarket.service.CarritoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class CarritoServiceImpl implements CarritoService {
 
-    @Autowired
-    private CarritoRepository carritoRepository;
+    private final CarritoRepository carritoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ProductoRepository productoRepository;
 
-    @Override
-    public List<Carrito> findAll() {
-        return carritoRepository.findAll();
+    public CarritoServiceImpl(CarritoRepository carritoRepository,
+                              UsuarioRepository usuarioRepository,
+                              ProductoRepository productoRepository) {
+        this.carritoRepository = carritoRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.productoRepository = productoRepository;
     }
 
     @Override
-    public Carrito findById(Long id) {
-        return carritoRepository.findById(id).orElse(null);
+    public List<Carrito> findByUsername(String username) {
+        return carritoRepository.findByUsuarioUsername(username);
     }
 
     @Override
-    public Carrito save(Carrito carrito) {
+    @Transactional
+    public Carrito agregar(String username, Long productoId, Integer cantidad) {
+        if (cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser positiva");
+        }
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+        Carrito carrito = carritoRepository
+                .findByUsuarioUsernameAndProductoId(username, productoId)
+                .orElseGet(() -> nuevoItem(usuario, producto));
+        carrito.setCantidad(carrito.getCantidad() + cantidad);
         return carritoRepository.save(carrito);
     }
 
     @Override
-    public void deleteById(Long id) {
-        carritoRepository.deleteById(id);
+    public void eliminar(String username, Long carritoId) {
+        Carrito carrito = carritoRepository.findByIdAndUsuarioUsername(carritoId, username)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado en el carrito"));
+        carritoRepository.delete(carrito);
     }
 
-    @Override
-    public List<Carrito> findByUsuarioId(Long usuarioId) {
-        return carritoRepository.findByUsuarioId(usuarioId);
+    private Carrito nuevoItem(Usuario usuario, Producto producto) {
+        Carrito carrito = new Carrito();
+        carrito.setUsuario(usuario);
+        carrito.setProducto(producto);
+        carrito.setCantidad(0);
+        return carrito;
     }
 }
