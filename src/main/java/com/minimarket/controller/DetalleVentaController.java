@@ -4,7 +4,6 @@ import com.minimarket.entity.DetalleVenta;
 import com.minimarket.service.DetalleVentaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +21,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Tag(name = "Detalle de ventas", description = "Lineas de productos vendidas")
 public class DetalleVentaController {
 
-    @Autowired
-    private DetalleVentaService detalleVentaService;
+    private final DetalleVentaService detalleVentaService;
+
+    public DetalleVentaController(DetalleVentaService detalleVentaService) {
+        this.detalleVentaService = detalleVentaService;
+    }
 
     @GetMapping
     @Operation(summary = "Listar detalles de venta")

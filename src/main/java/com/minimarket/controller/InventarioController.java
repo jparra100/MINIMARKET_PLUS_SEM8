@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +24,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Tag(name = "Inventario", description = "Movimientos de entrada y salida por sucursal")
 public class InventarioController {
 
-    @Autowired
-    private InventarioService inventarioService;
+    private final InventarioService inventarioService;
+
+    public InventarioController(InventarioService inventarioService) {
+        this.inventarioService = inventarioService;
+    }
 
     @Operation(summary = "Listar inventario", description = "Retorna todos los movimientos de inventario")
     @ApiResponses({
