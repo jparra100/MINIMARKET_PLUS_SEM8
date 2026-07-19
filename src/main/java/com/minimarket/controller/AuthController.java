@@ -4,6 +4,10 @@ import com.minimarket.security.model.AuthResponse;
 import com.minimarket.security.model.LoginRequest;
 import com.minimarket.security.model.RegisterRequest;
 import com.minimarket.security.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticacion", description = "Registro e inicio de sesion con JWT")
 public class AuthController {
 
     private final AuthService authService;
@@ -26,6 +31,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Iniciar sesion", description = "Valida las credenciales y entrega un token JWT",
+            security = {})
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Credenciales validas"),
+        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas")
+    })
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             return ResponseEntity.ok(authService.login(request));
@@ -36,6 +47,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar cliente", description = "Crea una cuenta con rol CLIENTE y entrega un token JWT",
+            security = {})
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Cliente registrado"),
+        @ApiResponse(responseCode = "400", description = "Datos de registro invalidos"),
+        @ApiResponse(responseCode = "409", description = "Nombre de usuario ya registrado")
+    })
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
             AuthResponse response = authService.register(request);

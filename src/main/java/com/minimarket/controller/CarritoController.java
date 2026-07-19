@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/carrito")
+@Tag(name = "Carrito", description = "Carrito asociado al cliente autenticado")
 public class CarritoController {
 
     private final CarritoService carritoService;
@@ -65,6 +67,7 @@ public class CarritoController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Quitar un producto del carrito")
     public ResponseEntity<Void> eliminarProductoDelCarrito(@PathVariable Long id, Principal principal) {
         try {
             carritoService.eliminar(principal.getName(), id);

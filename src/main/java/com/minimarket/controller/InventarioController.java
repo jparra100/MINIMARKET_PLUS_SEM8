@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/inventario")
+@Tag(name = "Inventario", description = "Movimientos de entrada y salida por sucursal")
 public class InventarioController {
 
     @Autowired
@@ -40,6 +42,7 @@ public class InventarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un movimiento de inventario")
     public EntityModel<Inventario> obtenerMovimientoPorId(@PathVariable Long id) {
         Inventario inventario = inventarioService.findById(id);
         return EntityModel.of(inventario,

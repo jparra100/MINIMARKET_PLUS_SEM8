@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@Tag(name = "Usuarios", description = "Administracion protegida de clientes y empleados")
 public class UsuarioController {
 
     @Autowired
@@ -40,6 +42,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un usuario")
     public EntityModel<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
         return EntityModel.of(usuario.orElseThrow(),
@@ -63,6 +66,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar un usuario")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id,
                                                        @Valid @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
@@ -74,6 +78,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un usuario")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) {

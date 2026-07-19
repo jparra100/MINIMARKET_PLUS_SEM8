@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/productos")
+@Tag(name = "Productos", description = "Catalogo centralizado de productos")
 public class ProductoController {
 
     @Autowired
@@ -39,6 +41,7 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener un producto")
     public EntityModel<Producto> obtenerProductoPorId(@PathVariable Long id) {
         Producto producto = productoService.findById(id);
         return EntityModel.of(producto,
@@ -62,6 +65,7 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar un producto")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id,
                                                         @Valid @RequestBody Producto producto) {
         Producto productoExistente = productoService.findById(id);
@@ -73,6 +77,7 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un producto")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         Producto producto = productoService.findById(id);
         if (producto != null) {
