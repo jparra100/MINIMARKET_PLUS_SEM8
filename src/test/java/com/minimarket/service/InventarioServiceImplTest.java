@@ -1,11 +1,14 @@
 package com.minimarket.service;
 
 import com.minimarket.entity.Inventario;
+import com.minimarket.entity.OrdenCompra;
 import com.minimarket.entity.Producto;
+import com.minimarket.entity.Proveedor;
 import com.minimarket.entity.StockSucursal;
 import com.minimarket.entity.Sucursal;
 import com.minimarket.entity.TipoMovimiento;
 import com.minimarket.repository.InventarioRepository;
+import com.minimarket.repository.OrdenCompraRepository;
 import com.minimarket.repository.ProductoRepository;
 import com.minimarket.repository.StockSucursalRepository;
 import com.minimarket.repository.SucursalRepository;
@@ -36,6 +39,8 @@ class InventarioServiceImplTest {
     private SucursalRepository sucursalRepository;
     @Mock
     private StockSucursalRepository stockRepository;
+    @Mock
+    private OrdenCompraRepository ordenCompraRepository;
 
     private InventarioServiceImpl service;
     private Producto producto;
@@ -45,7 +50,8 @@ class InventarioServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new InventarioServiceImpl(
-                inventarioRepository, productoRepository, sucursalRepository, stockRepository);
+                inventarioRepository, productoRepository, sucursalRepository,
+                stockRepository, ordenCompraRepository);
         producto = new Producto();
         producto.setId(1L);
         producto.setStock(10);
@@ -84,5 +90,25 @@ class InventarioServiceImplTest {
         assertEquals(5, stockSucursal.getCantidad());
         assertEquals(10, producto.getStock());
         verify(inventarioRepository, never()).save(any());
+    }
+
+    @Test
+    void generaOrdenCuandoElStockLlegaAlMinimo() {
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(1L);
+        producto.setProveedor(proveedor);
+        stockSucursal.setId(1L);
+        stockSucursal.setStockMinimo(5);
+        when(ordenCompraRepository.existsByStockSucursalIdAndEstado(any(), any()))
+                .thenReturn(false);
+        when(inventarioRepository.save(any(Inventario.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.registrarMovimiento(1L, 1L, 1, TipoMovimiento.SALIDA);
+
+        verify(ordenCompraRepository).save(org.mockito.ArgumentMatchers.argThat(
+                orden -> orden.getCantidad() == 6
+                        && orden.getProveedor() == proveedor
+                        && orden.getStockSucursal() == stockSucursal));
     }
 }

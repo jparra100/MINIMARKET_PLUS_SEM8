@@ -40,6 +40,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/sucursales/**", "/api/stock/**")
                         .authenticated()
                         .requestMatchers("/api/sucursales/**", "/api/stock/**").hasRole("ADMIN")
+                        .requestMatchers("/api/proveedores/**", "/api/ordenes-compra/**")
+                        .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/inventario/**").hasAnyRole("ADMIN", "CAJERO")
                         .requestMatchers("/api/inventario/**").hasRole("ADMIN")
                         .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "CAJERO")
