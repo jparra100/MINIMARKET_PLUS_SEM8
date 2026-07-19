@@ -81,6 +81,51 @@ class AuthIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void registraUnClienteYEntregaSuToken() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"cliente_nuevo\",\"password\":\"Cliente456!\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.token", not(blankOrNullString())))
+                .andExpect(jsonPath("$.roles[0]").value("ROLE_CLIENTE"));
+    }
+
+    @Test
+    void rechazaUnNombreDeUsuarioDuplicado() throws Exception {
+        String registro = "{\"username\":\"cliente_repetido\",\"password\":\"Cliente456!\"}";
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registro))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registro))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void rechazaUnTokenInvalido() throws Exception {
+        mockMvc.perform(get("/api/pedidos")
+                        .header("Authorization", "Bearer token-invalido"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void limitaAlCajeroSegunSusPermisos() throws Exception {
+        String token = login("cajero", "Cajero123!");
+
+        mockMvc.perform(get("/api/inventario")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/reportes/rotacion-productos")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
     private String login(String username, String password) throws Exception {
         String response = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
