@@ -1,152 +1,147 @@
 # MINIMARKET PLUS SEM8
 
-Backend REST para la gestión de un minimarket. El proyecto permite administrar usuarios y roles, categorías, productos, movimientos de inventario, carritos de compra, ventas y sus detalles.
+Backend REST desarrollado con Spring Boot para centralizar la operación de un minimarket con varias sucursales. Esta versión corresponde a la EFT, forma C.
+
+## Funciones implementadas
+
+- Inventario y disponibilidad de productos por sucursal en tiempo real.
+- Generación automática de órdenes de compra cuando el stock llega al mínimo.
+- Recepción de órdenes con actualización del inventario.
+- Reporte de productos con mayor y menor rotación.
+- Carrito y pedidos en línea para retiro en tienda o despacho a domicilio.
+- Ofertas y promociones centralizadas con cálculo del precio vigente.
+- Registro e inicio de sesión con JWT.
+- Autorización por roles `ADMIN`, `CAJERO` y `CLIENTE`.
+- Documentación OpenAPI y navegación HATEOAS.
+- Pruebas unitarias, de integración y reporte de cobertura JaCoCo.
 
 ## Tecnologías
 
 - Java 17
 - Spring Boot 3.4.1
-- Spring Web
-- Spring Data JPA
-- Spring Security
-- H2 Database (en memoria)
+- Spring Web, Data JPA, Security y HATEOAS
+- JWT con JJWT
+- H2 en memoria
+- springdoc-openapi / Swagger UI
+- JUnit 5, Mockito y JaCoCo
 - Maven Wrapper
-- JUnit 5
-
-## Funcionalidades
-
-- CRUD de usuarios.
-- CRUD de categorías y productos.
-- Registro y consulta de movimientos de inventario.
-- Gestión de productos en el carrito de cada usuario.
-- Registro y consulta de ventas y detalles de venta.
-- Usuarios asociados a uno o más roles.
-- Autenticación mediante formulario y sesión de Spring Security.
-- Persistencia temporal en una base de datos H2 en memoria.
-
-## Modelo de datos
-
-Las entidades principales y sus relaciones son:
-
-- `Usuario`: contiene nombre de usuario, contraseña y roles.
-- `Rol`: representa las autoridades asignadas a los usuarios.
-- `Categoria`: agrupa uno o más productos.
-- `Producto`: contiene nombre, precio, stock y categoría.
-- `Inventario`: registra entradas o salidas de un producto.
-- `Carrito`: relaciona un usuario con un producto y una cantidad.
-- `Venta`: pertenece a un usuario y contiene sus detalles.
-- `DetalleVenta`: relaciona una venta con un producto, cantidad y precio.
-
-## Endpoints
-
-Salvo la ruta pública indicada, los endpoints requieren una sesión autenticada.
-
-| Recurso | Método | Ruta | Descripción |
-|---|---|---|---|
-| Público | `GET` | `/public/hola` | Comprueba que la aplicación está disponible |
-| Usuarios | `GET` | `/api/usuarios` | Lista los usuarios |
-| Usuarios | `GET` | `/api/usuarios/{id}` | Obtiene un usuario |
-| Usuarios | `POST` | `/api/usuarios` | Crea un usuario |
-| Usuarios | `PUT` | `/api/usuarios/{id}` | Actualiza un usuario |
-| Usuarios | `DELETE` | `/api/usuarios/{id}` | Elimina un usuario |
-| Categorías | `GET`, `POST` | `/api/categorias` | Lista o crea categorías |
-| Categorías | `GET`, `PUT`, `DELETE` | `/api/categorias/{id}` | Consulta, actualiza o elimina una categoría |
-| Productos | `GET`, `POST` | `/api/productos` | Lista o crea productos |
-| Productos | `GET`, `PUT`, `DELETE` | `/api/productos/{id}` | Consulta, actualiza o elimina un producto |
-| Inventario | `GET`, `POST` | `/api/inventario` | Lista o registra movimientos |
-| Inventario | `GET`, `PUT`, `DELETE` | `/api/inventario/{id}` | Consulta, actualiza o elimina un movimiento |
-| Carrito | `GET`, `POST` | `/api/carrito` | Lista o agrega elementos al carrito |
-| Carrito | `GET`, `PUT`, `DELETE` | `/api/carrito/{id}` | Consulta, actualiza o elimina un elemento |
-| Ventas | `GET`, `POST` | `/api/ventas` | Lista o registra ventas |
-| Ventas | `GET` | `/api/ventas/{id}` | Obtiene una venta |
-| Detalles | `GET`, `POST` | `/api/detalle-ventas` | Lista o registra detalles de venta |
-| Detalles | `GET`, `PUT`, `DELETE` | `/api/detalle-ventas/{id}` | Consulta, actualiza o elimina un detalle |
-
-## Requisitos
-
-- JDK 17 o superior.
-- No es necesario instalar Maven: el repositorio incluye Maven Wrapper.
 
 ## Ejecución local
 
-Clona el repositorio y entra en su carpeta:
-
-```bash
-git clone https://github.com/jparra100/MINIMARKET_PLUS_SEM8.git
-cd MINIMARKET_PLUS_SEM8
-```
-
-En Windows:
+Requisitos: JDK 17 o superior. Maven no necesita instalación porque el repositorio incluye el Wrapper.
 
 ```powershell
+git clone https://github.com/jparra100/MINIMARKET_PLUS_SEM8.git
+cd MINIMARKET_PLUS_SEM8
+$env:DEMO_DATA_ENABLED="true"
 .\mvnw.cmd spring-boot:run
 ```
 
-En Linux o macOS:
-
-```bash
-./mvnw spring-boot:run
-```
-
-La aplicación queda disponible en `http://localhost:8080`. La ruta pública de comprobación es:
+La API queda disponible en `http://localhost:8080` y Swagger UI en:
 
 ```text
-GET http://localhost:8080/public/hola
+http://localhost:8080/swagger-ui/index.html
 ```
 
-## Base de datos H2
+Los datos de demostración están desactivados por defecto. Al habilitar `DEMO_DATA_ENABLED` se crean estas cuentas:
 
-La configuración actual utiliza una base de datos en memoria:
+| Usuario | Contraseña de demostración | Rol |
+|---|---|---|
+| `admin` | `Admin123!` | `ADMIN` |
+| `cajero` | `Cajero123!` | `CAJERO` |
+| `cliente` | `Cliente123!` | `CLIENTE` |
 
-```text
-URL JDBC: jdbc:h2:mem:testdb
-Usuario: sa
-Contraseña: vacía
-```
+Las contraseñas se pueden cambiar con `ADMIN_PASSWORD`, `CAJERO_PASSWORD` y `CLIENTE_PASSWORD`. La clave de firma debe externalizarse mediante `JWT_SECRET` fuera del ambiente académico.
 
-La consola H2 está habilitada en `http://localhost:8080/h2-console`. Como los datos están en memoria, se pierden al detener la aplicación.
+## Uso de JWT en Swagger
 
-## Pruebas
+1. Ejecutar `POST /api/auth/login` con una cuenta de demostración.
+2. Copiar el valor de `token` de la respuesta.
+3. Presionar **Authorize** en Swagger UI.
+4. Pegar sólo el token; Swagger agrega automáticamente el prefijo `Bearer`.
+5. Ejecutar los endpoints permitidos para el rol autenticado.
 
-En Windows:
+También es posible crear una cuenta de cliente con `POST /api/auth/register`.
+
+## Permisos principales
+
+| Recurso | ADMIN | CAJERO | CLIENTE |
+|---|---:|---:|---:|
+| Usuarios y roles | Administrar | No | No |
+| Productos | Administrar | Consultar | Consultar |
+| Sucursales y stock | Administrar | Consultar | Consultar |
+| Proveedores y órdenes de compra | Administrar | No | No |
+| Inventario | Administrar | Consultar | No |
+| Ventas y detalles | Consultar/registrar | Consultar/registrar | No |
+| Promociones | Administrar | Consultar | Consultar |
+| Carrito y pedidos propios | Sí | Sí | Sí |
+| Reporte de rotación | Sí | No | No |
+
+## Endpoints de la forma C
+
+| Función | Método y ruta |
+|---|---|
+| Registro e inicio de sesión | `POST /api/auth/register`, `POST /api/auth/login` |
+| Sucursales | `/api/sucursales` |
+| Stock centralizado | `GET /api/stock` |
+| Disponibilidad por producto | `GET /api/stock/producto/{productoId}` |
+| Stock por sucursal | `GET /api/stock/sucursal/{sucursalId}` |
+| Stock mínimo | `PATCH /api/stock/{id}/minimo?cantidad={valor}` |
+| Movimientos de inventario | `GET`, `POST /api/inventario` |
+| Proveedores | `/api/proveedores` |
+| Órdenes automáticas | `GET /api/ordenes-compra` |
+| Recepción de orden | `PATCH /api/ordenes-compra/{id}/recibir` |
+| Promociones | `/api/promociones` |
+| Precio promocional | `GET /api/promociones/precio/{productoId}` |
+| Carrito del cliente | `GET`, `POST /api/carrito` |
+| Eliminar del carrito | `DELETE /api/carrito/{id}` |
+| Crear y listar pedidos propios | `GET`, `POST /api/pedidos` |
+| Ventas para empleados | `GET`, `POST /api/ventas` |
+| Rotación de productos | `GET /api/reportes/rotacion-productos` |
+
+Swagger UI contiene el contrato completo, los cuerpos de solicitud y los códigos de respuesta. Las respuestas de recursos incluyen `_links` para navegar hacia operaciones relacionadas mediante HATEOAS.
+
+## Pruebas y cobertura
+
+Ejecutar todas las pruebas:
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-En Linux o macOS:
+Ejecutar las pruebas y generar el reporte JaCoCo:
 
-```bash
-./mvnw test
+```powershell
+.\mvnw.cmd clean verify
+start target\site\jacoco\index.html
 ```
 
-## Estructura del proyecto
+La suite comprueba, entre otros casos:
 
-```text
-src/
-├── main/
-│   ├── java/com/minimarket/
-│   │   ├── controller/    # Endpoints REST
-│   │   ├── entity/        # Entidades JPA
-│   │   ├── repository/    # Acceso a datos
-│   │   ├── security/      # Configuración y modelos de seguridad
-│   │   └── service/       # Lógica de negocio
-│   └── resources/
-│       └── application.properties
-└── test/java/com/minimarket/       # Pruebas automatizadas
-```
+- autenticación, registro, token inválido y permisos por rol;
+- movimientos y stock por sucursal;
+- generación y recepción de órdenes de compra;
+- aplicación de promociones vigentes;
+- creación de pedidos y descuento transaccional de stock;
+- reporte de productos vendidos y no vendidos;
+- publicación de OpenAPI y enlaces HATEOAS.
 
-## Estado actual y mejoras pendientes
+## Configuración opcional
 
-Este repositorio corresponde a una versión inicial del backend. Actualmente:
+| Variable | Uso | Valor predeterminado |
+|---|---|---|
+| `DEMO_DATA_ENABLED` | Crea las tres cuentas de demostración | `false` |
+| `JWT_SECRET` | Clave Base64 para firmar JWT | clave académica de desarrollo |
+| `H2_CONSOLE_ENABLED` | Habilita la consola H2 | `false` |
+| `ADMIN_PASSWORD` | Contraseña de demostración del admin | `Admin123!` |
+| `CAJERO_PASSWORD` | Contraseña de demostración del cajero | `Cajero123!` |
+| `CLIENTE_PASSWORD` | Contraseña de demostración del cliente | `Cliente123!` |
 
-- No incluye datos iniciales ni un usuario administrador creado automáticamente.
-- La API usa autenticación por formulario y sesión; `JwtUtil` todavía no implementa JWT.
-- Los endpoints de roles no están expuestos mediante un controlador REST.
-- Las ventas solo cuentan con operaciones de creación y consulta.
-- Conviene incorporar DTO, validación de entradas y manejo global de errores.
-- Para producción se debe reemplazar H2 por una base persistente, externalizar credenciales y revisar la configuración de seguridad.
+Si se habilita la consola H2, queda en `http://localhost:8080/h2-console` con JDBC `jdbc:h2:mem:testdb`, usuario `sa` y contraseña vacía.
 
-## Repositorio
+## Material de entrega
 
-[github.com/jparra100/MINIMARKET_PLUS_SEM8](https://github.com/jparra100/MINIMARKET_PLUS_SEM8)
+- [Borrador del informe EFT](docs/INFORME_EFT.md)
+- [Guía de evidencias y video](docs/GUIA_EVIDENCIAS_Y_VIDEO.md)
+
+El informe debe transferirse al formato institucional disponible en AVA, completar los integrantes, insertar las capturas reales y exportarse a PDF antes de la entrega.
