@@ -2,6 +2,8 @@ package com.minimarket.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
@@ -11,10 +13,13 @@ public class Usuario {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "El usuario es obligatorio")
     private String username;
 
     @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

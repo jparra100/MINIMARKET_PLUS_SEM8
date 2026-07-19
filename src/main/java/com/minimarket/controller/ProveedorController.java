@@ -2,6 +2,7 @@ package com.minimarket.controller;
 
 import com.minimarket.entity.Proveedor;
 import com.minimarket.service.ProveedorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,13 +38,13 @@ public class ProveedorController {
     }
 
     @PostMapping
-    public ResponseEntity<Proveedor> crear(@RequestBody Proveedor proveedor) {
+    public ResponseEntity<Proveedor> crear(@Valid @RequestBody Proveedor proveedor) {
         return ResponseEntity.status(HttpStatus.CREATED).body(proveedorService.save(proveedor));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Proveedor> actualizar(@PathVariable Long id,
-                                                 @RequestBody Proveedor proveedor) {
+                                                 @Valid @RequestBody Proveedor proveedor) {
         if (proveedorService.findById(id) == null) {
             return ResponseEntity.notFound().build();
         }

@@ -2,6 +2,7 @@ package com.minimarket.controller;
 
 import com.minimarket.entity.Usuario;
 import com.minimarket.service.UsuarioService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,7 +54,7 @@ public class UsuarioController {
         @ApiResponse(responseCode = "500", description = "Error interno no controlado en el servidor")
     })
     @PostMapping
-    public ResponseEntity<EntityModel<Usuario>> guardarUsuario(@RequestBody Usuario usuario) {
+    public ResponseEntity<EntityModel<Usuario>> guardarUsuario(@Valid @RequestBody Usuario usuario) {
         Usuario saved = usuarioService.save(usuario);
         EntityModel<Usuario> model = EntityModel.of(saved,
             linkTo(methodOn(UsuarioController.class).obtenerUsuarioPorId(saved.getId())).withSelfRel(),
@@ -62,7 +63,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id,
+                                                       @Valid @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
         if (usuarioExistente.isPresent()) {
             usuario.setId(id);

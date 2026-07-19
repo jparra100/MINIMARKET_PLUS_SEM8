@@ -3,6 +3,7 @@ package com.minimarket.controller;
 import com.minimarket.dto.AgregarCarritoRequest;
 import com.minimarket.entity.Carrito;
 import com.minimarket.service.CarritoService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -48,7 +49,7 @@ public class CarritoController {
         @ApiResponse(responseCode = "500", description = "Error interno no controlado en el servidor")
     })
     @PostMapping
-    public ResponseEntity<?> agregarProductoAlCarrito(@RequestBody AgregarCarritoRequest request,
+    public ResponseEntity<?> agregarProductoAlCarrito(@Valid @RequestBody AgregarCarritoRequest request,
                                                        Principal principal) {
         try {
             Carrito saved = carritoService.agregar(

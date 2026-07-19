@@ -3,6 +3,7 @@ package com.minimarket.controller;
 import com.minimarket.dto.CrearPedidoRequest;
 import com.minimarket.entity.Venta;
 import com.minimarket.service.VentaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody CrearPedidoRequest request, Principal principal) {
+    public ResponseEntity<?> crear(@Valid @RequestBody CrearPedidoRequest request, Principal principal) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ventaService.crearPedido(principal.getName(), request));

@@ -1,7 +1,12 @@
 package com.minimarket.security.model;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequest {
+    @NotBlank(message = "El usuario es obligatorio")
     private String username;
+
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     public String getUsername() {

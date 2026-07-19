@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Sucursal {
@@ -14,9 +15,11 @@ public class Sucursal {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "El nombre de la sucursal es obligatorio")
     private String nombre;
 
     @Column(nullable = false)
+    @NotBlank(message = "La dirección de la sucursal es obligatoria")
     private String direccion;
 
     public Long getId() {

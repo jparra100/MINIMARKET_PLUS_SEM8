@@ -2,6 +2,7 @@ package com.minimarket.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 @Entity
@@ -11,6 +12,7 @@ public class Categoria {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "El nombre de la categoría es obligatorio")
     private String nombre;
 
     @JsonIgnore

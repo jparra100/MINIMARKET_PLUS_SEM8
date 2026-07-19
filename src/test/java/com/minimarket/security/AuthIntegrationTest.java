@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "app.demo-data.enabled=true")
 @AutoConfigureMockMvc
 class AuthIntegrationTest {
 
@@ -49,6 +49,18 @@ class AuthIntegrationTest {
     void protegeUsuariosCuandoNoHayToken() throws Exception {
         mockMvc.perform(get("/api/usuarios"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void informaLosCamposObligatoriosDelLogin() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.validationErrors.username")
+                        .value("El usuario es obligatorio"))
+                .andExpect(jsonPath("$.validationErrors.password")
+                        .value("La contraseña es obligatoria"));
     }
 
     @Test

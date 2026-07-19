@@ -2,6 +2,7 @@ package com.minimarket.controller;
 
 import com.minimarket.entity.Sucursal;
 import com.minimarket.service.SucursalService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,12 +38,13 @@ public class SucursalController {
     }
 
     @PostMapping
-    public ResponseEntity<Sucursal> crear(@RequestBody Sucursal sucursal) {
+    public ResponseEntity<Sucursal> crear(@Valid @RequestBody Sucursal sucursal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sucursalService.save(sucursal));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sucursal> actualizar(@PathVariable Long id, @RequestBody Sucursal sucursal) {
+    public ResponseEntity<Sucursal> actualizar(@PathVariable Long id,
+                                                @Valid @RequestBody Sucursal sucursal) {
         if (sucursalService.findById(id) == null) {
             return ResponseEntity.notFound().build();
         }

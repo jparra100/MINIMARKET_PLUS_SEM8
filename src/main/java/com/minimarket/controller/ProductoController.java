@@ -2,6 +2,7 @@ package com.minimarket.controller;
 
 import com.minimarket.entity.Producto;
 import com.minimarket.service.ProductoService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -52,7 +53,7 @@ public class ProductoController {
         @ApiResponse(responseCode = "500", description = "Error interno no controlado en el servidor")
     })
     @PostMapping
-    public ResponseEntity<EntityModel<Producto>> guardarProducto(@RequestBody Producto producto) {
+    public ResponseEntity<EntityModel<Producto>> guardarProducto(@Valid @RequestBody Producto producto) {
         Producto saved = productoService.save(producto);
         EntityModel<Producto> model = EntityModel.of(saved,
             linkTo(methodOn(ProductoController.class).obtenerProductoPorId(saved.getId())).withSelfRel(),
@@ -61,7 +62,8 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id,
+                                                        @Valid @RequestBody Producto producto) {
         Producto productoExistente = productoService.findById(id);
         if (productoExistente != null) {
             producto.setId(id);

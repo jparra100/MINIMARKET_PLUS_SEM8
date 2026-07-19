@@ -1,6 +1,10 @@
 package com.minimarket.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
 public class Producto {
@@ -9,16 +13,22 @@ public class Producto {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "El nombre del producto es obligatorio")
     private String nombre;
 
     @Column(nullable = false)
+    @NotNull(message = "El precio es obligatorio")
+    @Positive(message = "El precio debe ser positivo")
     private Double precio;
 
     @Column(nullable = false)
+    @NotNull(message = "El stock es obligatorio")
+    @PositiveOrZero(message = "El stock no puede ser negativo")
     private Integer stock;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
+    @NotNull(message = "La categoría es obligatoria")
     private Categoria categoria;
 
     @ManyToOne

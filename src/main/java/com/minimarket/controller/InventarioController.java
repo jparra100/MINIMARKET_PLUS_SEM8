@@ -3,6 +3,7 @@ package com.minimarket.controller;
 import com.minimarket.entity.Inventario;
 import com.minimarket.dto.MovimientoInventarioRequest;
 import com.minimarket.service.InventarioService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -53,7 +54,7 @@ public class InventarioController {
         @ApiResponse(responseCode = "500", description = "Error interno no controlado en el servidor")
     })
     @PostMapping
-    public ResponseEntity<?> registrarMovimiento(@RequestBody MovimientoInventarioRequest request) {
+    public ResponseEntity<?> registrarMovimiento(@Valid @RequestBody MovimientoInventarioRequest request) {
         try {
             Inventario saved = inventarioService.registrarMovimiento(
                     request.productoId(), request.sucursalId(),

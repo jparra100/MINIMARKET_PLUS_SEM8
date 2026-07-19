@@ -5,6 +5,7 @@ import com.minimarket.dto.CrearVentaRequest;
 import com.minimarket.entity.TipoEntrega;
 import com.minimarket.entity.Venta;
 import com.minimarket.service.VentaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class VentaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> guardarVenta(@RequestBody CrearVentaRequest request) {
+    public ResponseEntity<?> guardarVenta(@Valid @RequestBody CrearVentaRequest request) {
         try {
             CrearPedidoRequest pedido = new CrearPedidoRequest(
                     request.sucursalId(), TipoEntrega.RETIRO_TIENDA, null);
