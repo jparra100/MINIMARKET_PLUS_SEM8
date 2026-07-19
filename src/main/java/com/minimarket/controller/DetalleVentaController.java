@@ -4,7 +4,10 @@ import com.minimarket.entity.DetalleVenta;
 import com.minimarket.service.DetalleVentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -26,28 +29,4 @@ public class DetalleVentaController {
         return (detalleVenta != null) ? ResponseEntity.ok(detalleVenta) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public DetalleVenta guardarDetalleVenta(@RequestBody DetalleVenta detalleVenta) {
-        return detalleVentaService.save(detalleVenta);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<DetalleVenta> actualizarDetalleVenta(@PathVariable Long id, @RequestBody DetalleVenta detalleVenta) {
-        DetalleVenta existente = detalleVentaService.findById(id);
-        if (existente != null) {
-            detalleVenta.setId(id);
-            return ResponseEntity.ok(detalleVentaService.save(detalleVenta));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarDetalleVenta(@PathVariable Long id) {
-        DetalleVenta detalleVenta = detalleVentaService.findById(id);
-        if (detalleVenta != null) {
-            detalleVentaService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
 }
