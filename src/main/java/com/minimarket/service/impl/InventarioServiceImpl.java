@@ -1,18 +1,38 @@
 package com.minimarket.service.impl;
 
 import com.minimarket.entity.Inventario;
+import com.minimarket.entity.Producto;
+import com.minimarket.entity.StockSucursal;
+import com.minimarket.entity.Sucursal;
+import com.minimarket.entity.TipoMovimiento;
 import com.minimarket.repository.InventarioRepository;
+import com.minimarket.repository.ProductoRepository;
+import com.minimarket.repository.StockSucursalRepository;
+import com.minimarket.repository.SucursalRepository;
 import com.minimarket.service.InventarioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class InventarioServiceImpl implements InventarioService {
 
-    @Autowired
-    private InventarioRepository inventarioRepository;
+    private final InventarioRepository inventarioRepository;
+    private final ProductoRepository productoRepository;
+    private final SucursalRepository sucursalRepository;
+    private final StockSucursalRepository stockRepository;
+
+    public InventarioServiceImpl(InventarioRepository inventarioRepository,
+                                 ProductoRepository productoRepository,
+                                 SucursalRepository sucursalRepository,
+                                 StockSucursalRepository stockRepository) {
+        this.inventarioRepository = inventarioRepository;
+        this.productoRepository = productoRepository;
+        this.sucursalRepository = sucursalRepository;
+        this.stockRepository = stockRepository;
+    }
 
     @Override
     public List<Inventario> findAll() {
@@ -25,17 +45,52 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public Inventario save(Inventario inventario) {
-        return inventarioRepository.save(inventario);
-    }
+    @Transactional
+    public Inventario registrarMovimiento(Long productoId, Long sucursalId,
+                                          Integer cantidad, TipoMovimiento tipoMovimiento) {
+        if (cantidad == null || cantidad <= 0 || tipoMovimiento == null) {
+            throw new IllegalArgumentException("La cantidad debe ser positiva y el tipo es obligatorio");
+        }
 
-    @Override
-    public void deleteById(Long id) {
-        inventarioRepository.deleteById(id);
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+        Sucursal sucursal = sucursalRepository.findById(sucursalId)
+                .orElseThrow(() -> new IllegalArgumentException("Sucursal no encontrada"));
+        StockSucursal stock = stockRepository.findByProductoIdAndSucursalId(productoId, sucursalId)
+                .orElseGet(() -> nuevoStock(producto, sucursal));
+
+        int diferencia = tipoMovimiento == TipoMovimiento.ENTRADA ? cantidad : -cantidad;
+        int cantidadSucursal = stock.getCantidad() + diferencia;
+        int stockTotal = producto.getStock() + diferencia;
+        if (cantidadSucursal < 0 || stockTotal < 0) {
+            throw new IllegalStateException("Stock insuficiente para registrar la salida");
+        }
+
+        stock.setCantidad(cantidadSucursal);
+        producto.setStock(stockTotal);
+        stockRepository.save(stock);
+        productoRepository.save(producto);
+
+        Inventario movimiento = new Inventario();
+        movimiento.setProducto(producto);
+        movimiento.setSucursal(sucursal);
+        movimiento.setCantidad(cantidad);
+        movimiento.setTipoMovimiento(tipoMovimiento);
+        movimiento.setFechaMovimiento(LocalDateTime.now());
+        return inventarioRepository.save(movimiento);
     }
 
     @Override
     public List<Inventario> findByProductoId(Long productoId) {
         return inventarioRepository.findByProductoId(productoId);
+    }
+
+    private StockSucursal nuevoStock(Producto producto, Sucursal sucursal) {
+        StockSucursal stock = new StockSucursal();
+        stock.setProducto(producto);
+        stock.setSucursal(sucursal);
+        stock.setCantidad(0);
+        stock.setStockMinimo(5);
+        return stock;
     }
 }

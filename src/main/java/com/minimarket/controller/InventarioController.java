@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Inventario;
+import com.minimarket.dto.MovimientoInventarioRequest;
 import com.minimarket.service.InventarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,31 +53,21 @@ public class InventarioController {
         @ApiResponse(responseCode = "500", description = "Error interno no controlado en el servidor")
     })
     @PostMapping
-    public ResponseEntity<EntityModel<Inventario>> registrarMovimiento(@RequestBody Inventario inventario) {
-        Inventario saved = inventarioService.save(inventario);
-        EntityModel<Inventario> model = EntityModel.of(saved,
-            linkTo(methodOn(InventarioController.class).obtenerMovimientoPorId(saved.getId())).withSelfRel(),
-            linkTo(methodOn(InventarioController.class).listarMovimientosDeInventario()).withRel("lista-inventario"));
-        return ResponseEntity.status(HttpStatus.CREATED).body(model);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Inventario> actualizarMovimiento(@PathVariable Long id, @RequestBody Inventario inventario) {
-        Inventario existente = inventarioService.findById(id);
-        if (existente != null) {
-            inventario.setId(id);
-            return ResponseEntity.ok(inventarioService.save(inventario));
+    public ResponseEntity<?> registrarMovimiento(@RequestBody MovimientoInventarioRequest request) {
+        try {
+            Inventario saved = inventarioService.registrarMovimiento(
+                    request.productoId(), request.sucursalId(),
+                    request.cantidad(), request.tipoMovimiento());
+            EntityModel<Inventario> model = EntityModel.of(saved,
+                    linkTo(methodOn(InventarioController.class)
+                            .obtenerMovimientoPorId(saved.getId())).withSelfRel(),
+                    linkTo(methodOn(InventarioController.class)
+                            .listarMovimientosDeInventario()).withRel("lista-inventario"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(model);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
         }
-        return ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
-        Inventario inventario = inventarioService.findById(id);
-        if (inventario != null) {
-            inventarioService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 }

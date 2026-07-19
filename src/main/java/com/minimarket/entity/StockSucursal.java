@@ -1,10 +1,19 @@
 package com.minimarket.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-public class Inventario {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"producto_id", "sucursal_id"}))
+public class StockSucursal {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,16 +27,11 @@ public class Inventario {
     private Sucursal sucursal;
 
     @Column(nullable = false)
-    private Integer cantidad;
+    private Integer cantidad = 0;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private TipoMovimiento tipoMovimiento;
+    private Integer stockMinimo = 5;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaMovimiento;
-
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -60,19 +64,11 @@ public class Inventario {
         this.cantidad = cantidad;
     }
 
-    public TipoMovimiento getTipoMovimiento() {
-        return tipoMovimiento;
+    public Integer getStockMinimo() {
+        return stockMinimo;
     }
 
-    public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
-        this.tipoMovimiento = tipoMovimiento;
-    }
-
-    public LocalDateTime getFechaMovimiento() {
-        return fechaMovimiento;
-    }
-
-    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
-        this.fechaMovimiento = fechaMovimiento;
+    public void setStockMinimo(Integer stockMinimo) {
+        this.stockMinimo = stockMinimo;
     }
 }
